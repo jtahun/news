@@ -10,4 +10,12 @@ class ArticleData {
     required this.title,
     required this.text,
   });
+
+  factory ArticleData.fromJson(Map<String, dynamic> json){
+    return ArticleData(
+      id:json['id'],
+      title:json['title'],
+      text: json['body']
+    );
+  }
 }
