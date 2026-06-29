@@ -12,4 +12,3 @@ void main() {
   GetIt.instance.registerSingleton<ArticlesProvider>(DioArticlesProvider());
   runApp(const App());
 }
-
