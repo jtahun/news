@@ -3,7 +3,6 @@ import 'package:news/models/article_data.dart';
 import 'package:get_it/get_it.dart';
 import 'package:news/models/comment_data.dart';
 import 'package:news/providers/articles_provider.dart';
-import 'package:news/providers/faker_articles_provider.dart';
 
 class ArticleNotifier extends ChangeNotifier {
   final _articlesProvider = GetIt.instance.get<ArticlesProvider>();

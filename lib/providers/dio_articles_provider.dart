@@ -1,44 +1,65 @@
+import 'package:dio/dio.dart';
 import 'package:news/models/article_data.dart';
 import 'package:news/models/comment_data.dart';
 import 'package:news/providers/articles_provider.dart';
-import 'package:dio/dio.dart';
 
-class DioArticlesProvider implements ArticlesProvider{
+class DioArticlesProvider implements ArticlesProvider {
   late final Dio _dio;
 
-  DiArticlesProvider(){
-    _dio = Dio(BaseOptions(baseUrl: 'https://dummyjson.com'),);
-  
-    _dio.interceptors.add(LogInterceptor());
+  DioArticlesProvider() {
+    _dio = Dio(
+      BaseOptions(baseUrl: 'https://dummyjson.com'),
+    );
+
+    _dio.interceptors.add(LogInterceptor(responseBody: true));
   }
-  
-  //final _dio = Dio();
-  //final _dio = Dio(BaseOptions(baseUrl:'https://dummyjson.com'));
+
   @override
-  Future<ArticleData?> getArticleById(int id) {
-    // TODO: implement getArticleById
-    throw UnimplementedError();
-    final response = await _dio.get('https://dummyjson.com/posts/$id');
-    try{
-       ArticlesData.fromJson(response.data as Map<String,dynamic>);
-    }catch(e){
-      throw Exception('Failed to load article $id:$e');
+  Future<ArticleData?> getArticleById(int id) async {
+    try {
+      final response = await _dio.get<Map<String, dynamic>>('/posts/$id');
+      final data = response.data;
+
+      if (data == null) {
+        return null;
+      }
+
+      return ArticleData.fromJson(data);
+    } catch (error) {
+      throw Exception('Failed to load article $id: $error');
     }
   }
 
   @override
-  Future<List<ArticleData>> getArticles() async{
-    final response = await _dio.get('https://dummyjson.com/posts');
-    //final resposne = await dio.get('/posts');
-    final list = response.data['posts'] as List;
-    
-    return list.map((postJson)=>ArticleData.fromJson(postJson)).toList();
+  Future<List<ArticleData>> getArticles() async {
+    try {
+      final response = await _dio.get<Map<String, dynamic>>('/posts');
+      final list = response.data?['posts'] as List? ?? const [];
+
+      return list
+          .whereType<Map<String, dynamic>>()
+          .map(ArticleData.fromJson)
+          .toList();
+    } catch (error) {
+      throw Exception('Failed to load articles: $error');
+    }
   }
 
   @override
-  Future<List<CommentData>> getComments(int articleId) {
-    // TODO: implement getComments
-    throw UnimplementedError();
-  }
+  Future<List<CommentData>> getComments(int articleId) async {
+    try {
+      final response = await _dio.get<Map<String, dynamic>>(
+        '/comments/post/$articleId',
+      );
 
+      final list = response.data?['comments'] as List? ?? const [];
+
+      return list
+          .whereType<Map<String, dynamic>>()
+          .map(CommentData.fromJson)
+          .toList();
+    } catch (error) {
+      throw Exception('Failed to load comments for article $articleId: $error');
+    }
+  }
 }
