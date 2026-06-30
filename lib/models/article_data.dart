@@ -1,5 +1,9 @@
-import 'package:news/models/comment_data.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'article_data.g.dart';
+
+
+@JsonSerializable()
 class ArticleData {
   final int id;
   final String title;
@@ -17,5 +21,13 @@ class ArticleData {
       title:json['title'] as String? ?? '',
       text: json['body'] as String? ?? '',
     );
+  }
+
+  Map<String, dynamic> toJson(){
+    return{
+      'id':id,
+      'title':title,
+      'body':text,
+    };
   }
 }
